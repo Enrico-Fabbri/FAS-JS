@@ -1,0 +1,18 @@
+{
+	"name": "fas",
+	"version": "1.0.0",
+	"description": "fob-anime-scraper",
+	"main": "src/index.js",
+	"scripts": {
+		"run": "node ./index.js",
+		"test": "node ./index.test.js"
+	},
+	"keywords": [],
+	"author": "Fob",
+	"license": "ISC",
+	"dependencies": {
+		"axios": "^1.6.5",
+		"cheerio": "^1.0.0-rc.12",
+		"child_process": "^1.0.2"
+	}
+}
