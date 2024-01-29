@@ -1,16 +1,3 @@
-<style>
-  table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center; /* Center the text within the cells */
-  }
-</style>
-
 # Fob Anime Scraper Information
 
 ## 'index.js'
