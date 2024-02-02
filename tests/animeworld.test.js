@@ -3,7 +3,7 @@ const { animeworld } = require("../index");
 async function measureExecutionTime() {
 	const startTime = performance.now();
 
-	let searchExecutionTime, getAnimeEpisodesExecutionTime;
+	let searchExecutionTime, getAnimeInfoTime, getAnimeEpisodesExecutionTime;
 
 	try {
 		const searchStartTime = performance.now();
@@ -12,6 +12,12 @@ async function measureExecutionTime() {
 		searchExecutionTime = searchEndTime - searchStartTime;
 
 		const mainPageLink = result[0].mainPageLink;
+
+		const getAnimeInfoStartTime = performance.now();
+		const info = await animeworld.getAnimeInfo(mainPageLink);
+		const getAnimeInfoEndTime = performance.now();
+
+		getAnimeInfoTime = getAnimeInfoEndTime - getAnimeInfoStartTime;
 
 		function f(min, max, currentProgress) {
 			//console.log(`${min} - ${currentProgress} -> ${max}`);
@@ -33,6 +39,9 @@ async function measureExecutionTime() {
 
 		console.log(
 			`AnimeWorld: search Function Execution time: ${searchExecutionTime} milliseconds`
+		);
+		console.log(
+			`AnimeWorld: getAnimeInfo Function Execution time: ${getAnimeInfoTime} milliseconds`
 		);
 		console.log(
 			`AnimeWorld: getAnimeEpisodes Function Execution time: ${getAnimeEpisodesExecutionTime} milliseconds`

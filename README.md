@@ -14,11 +14,12 @@
       <thead>
           <tr>
               <th>Name</th>
-              <th colspan="3">Time</th>
+              <th colspan="4">Time</th>
           </tr>
           <tr>
               <th>-</th>
               <th>search</th>
+              <th>getAnimeInfo</th>
               <th>getAnimeEpisodes</th>
               <th>Total</th>
           </tr>
@@ -26,21 +27,24 @@
       <tbody>
           <tr>
               <td>AnimeWorld</td>
-              <td>~175.0400 ms</td>
-              <td>~655.2986 ms</td>
-              <td>~830.3470 ms</td>
+              <td>~160.2179 ms</td>
+              <td>~585.5316 ms</td>
+              <td>~603.6827 ms</td>
+              <td>~1368.6448 ms</td>
           </tr>
           <tr>
               <td>AnimeItaly</td>
-              <td>~1262.7586 ms</td>
-              <td>~117.1933 ms</td>
-              <td>~1379.9574 ms</td>
+              <td>~1097.9673 ms</td>
+              <td>~649.9082</td>
+              <td>~616.5255 ms</td>
+              <td>~2394.8871 ms</td>
           </tr>
           <tr>
               <td>AnimeSaturn</td>
-              <td>~353.1590 ms</td>
-              <td>~24555.8575 ms</td>
-              <td>~24909.0731 ms</td>
+              <td>~280.1858 ms</td>
+              <td>~464.4078 ms</td>
+              <td>~24438.0334 ms</td>
+              <td>~25145.6578 ms</td>
           </tr>
       </tbody>
   </table>
@@ -59,10 +63,10 @@ function f(min, max, currentProgress) {
 animeworld.search(keywords)
   .then((animeList) => {
     const firstAnime = animeList[0];
-    return animeworld.getAnimeEpisodes(firstAnime.mainPageLink, f);
+    return { info: animeworld.getAnimeInfo(firstAnime.mainPageLink), episodes: animeworld.getAnimeEpisodes(firstAnime.mainPageLink) };
   })
-  .then((episodes) => {
-    const firstEpisode = episodes[0];
+  .then((anime) => {
+    const firstEpisode = anime.episodes[0];
     return animeworld.getVideoLink(firstEpisode.videoID);
   })
   .then((link){
@@ -104,10 +108,10 @@ function f(min, max, currentProgress) {
 animeitaly.search(keywords)
   .then((animeList) => {
     const firstAnime = animeList[0];
-    return animeitaly.getAnimeEpisodes(firstAnime.mainPageLink, f);
+    return { info: animeitaly.getAnimeInfo(firstAnime.mainPageLink), episodes: animeitaly.getAnimeEpisodes(firstAnime.mainPageLink) };
   })
-  .then((episodes) => {
-    const firstEpisode = episodes[0];
+  .then((anime) => {
+    const firstEpisode = anime.episodes[0];
     return animeitaly.getVideoLink(firstEpisode.videoID);
   })
   .then((link){
@@ -137,23 +141,23 @@ animeitaly.search(keywords)
 ```javascript
 // Example Usage:
 
-const keywords = "one piece";
+const keywords = "frieren";
 
 function f(min, max, currentProgress) {
-  console.log(`${min} - ${currentProgress} -> ${max}`);
+    console.log(`${min} - ${currentProgress} -> ${max}`);
 }
 
 animesaturn.search(keywords)
   .then((animeList) => {
     const firstAnime = animeList[0];
-    return animesaturn.getAnimeEpisodes(firstAnime.mainPageLink, f);
+    return { info: animesaturn.getAnimeInfo(firstAnime.mainPageLink), episodes: animesaturn.getAnimeEpisodes(firstAnime.mainPageLink) };
   })
-  .then((episodes) => {
-    const firstEpisode = episodes[0];
+  .then((anime) => {
+    const firstEpisode = anime.episodes[0];
     return animesaturn.getVideoLink(firstEpisode.videoID);
   })
   .then((link){
-    animesaturn.playVideo(link);
+      animesaturn.playVideo(link);
   })
   .catch((error) => {
     console.error(error.message);

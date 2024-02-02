@@ -14,10 +14,10 @@ const { exec } = require("child_process");
  * animesaturn.search(keywords)
  *   .then((animeList) => {
  *     const firstAnime = animeList[0];
- *     return animesaturn.getAnimeEpisodes(firstAnime.mainPageLink, f);
+ *     return { info: animesaturn.getAnimeInfo(firstAnime.mainPageLink), episodes: animesaturn.getAnimeEpisodes(firstAnime.mainPageLink) };
  *   })
- *   .then((episodes) => {
- *     const firstEpisode = episodes[0];
+ *   .then((anime) => {
+ *     const firstEpisode = anime.episodes[0];
  *     return animesaturn.getVideoLink(firstEpisode.videoID);
  *   })
  *   .then((link){
@@ -83,6 +83,47 @@ async function search(keywords) {
 
 		//console.log(found);
 		return found;
+	} catch (error) {
+		console.error("Error fetching the webpage:", error.message);
+		throw error;
+	}
+}
+
+/**
+ * Retrieves information about an anime from a given main page link.
+ *
+ * @param {string} mainPageLink - The main page link of the anime.
+ * @returns {{imageLink: string, title: string, genre: string, year: string, nEpisodes: string, plot: string}} An object containing anime information.
+ * @throws Will throw an error if there is an issue with the provided parameters or if there is an error fetching the webpage.
+ *
+ * @example
+ * // Fetch the info of the 'example-anime'
+ * const animeInfo = await getAnimeInfo('example-anime');
+ */
+async function getAnimeInfo(mainPageLink) {
+	try {
+		const response = await axios.get(`${link}${mainPageLink}`);
+		const $ = cheerio.load(response.data);
+
+		const imageLink = $(".cover-anime").attr("src");
+
+		const title = $(".anime-title-as b").html();
+
+		let genre = "";
+
+		$(".generi-as").each((index, element) => {
+			const value = $(element).html();
+			genre += genre != "" ? ", " + value : value;
+		});
+
+		let mainDiv = $(".bi-star").parent().text();
+
+		let year = mainDiv.match(/Data di uscita: (.*)/)[1];
+		let nEpisodes = mainDiv.match(/Episodi: (.*)/)[1];
+
+		let plot = $("#shown-trama").html();
+
+		return { imageLink, title, genre, year, nEpisodes, plot };
 	} catch (error) {
 		console.error("Error fetching the webpage:", error.message);
 		throw error;
@@ -252,6 +293,7 @@ function playVideo(videoLink) {
 
 module.exports = {
 	search,
+	getAnimeInfo,
 	getAnimeEpisodes,
 	getVideoLink,
 	playVideo,

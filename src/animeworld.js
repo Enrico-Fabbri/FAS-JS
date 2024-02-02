@@ -14,10 +14,10 @@ const { exec } = require("child_process");
  * animeworld.search(keywords)
  *   .then((animeList) => {
  *     const firstAnime = animeList[0];
- *     return animeworld.getAnimeEpisodes(firstAnime.mainPageLink);
+ *     return { info: animeworld.getAnimeInfo(firstAnime.mainPageLink), episodes: animeworld.getAnimeEpisodes(firstAnime.mainPageLink) };
  *   })
- *   .then((episodes) => {
- *     const firstEpisode = episodes[0];
+ *   .then((anime) => {
+ *     const firstEpisode = anime.episodes[0];
  *     return animeworld.getVideoLink(firstEpisode.videoID);
  *   })
  *   .then((link){
@@ -78,6 +78,57 @@ async function search(keywords) {
 
 		//console.log(found);
 		return found;
+	} catch (error) {
+		console.error("Error fetching the webpage:", error.message);
+		throw error;
+	}
+}
+
+/**
+ * Retrieves information about an anime from a given main page link.
+ *
+ * @param {string} mainPageLink - The main page link of the anime.
+ * @returns {{imageLink: string, title: string, genre: string, year: string, nEpisodes: string, plot: string}} An object containing anime information.
+ * @throws Will throw an error if there is an issue with the provided parameters or if there is an error fetching the webpage.
+ *
+ * @example
+ * // Fetch the info of the 'example-anime'
+ * const animeInfo = await getAnimeInfo('example-anime');
+ */
+async function getAnimeInfo(mainPageLink) {
+	try {
+		const response = await axios.get(`${link}${mainPageLink}`);
+		const $ = cheerio.load(response.data);
+
+		const mainDiv = $(".widget.info");
+
+		const imageLink = mainDiv.find("img").attr("src");
+
+		const description = mainDiv.find(".info");
+
+		const title = description.find(".title").html();
+
+		const info = description.find(".row dd");
+
+		let genre = "";
+		let year;
+		let episodes;
+
+		info.each((index, element) => {
+			if (index == 5)
+				$(element)
+					.find("a")
+					.each((index, element) => {
+						const value = $(element).html();
+						genre += genre != "" ? ", " + value : value;
+					});
+			if (index == 2) year = $(element).html();
+			if (index == 8) episodes = $(element).html();
+		});
+
+		const plot = description.find(".desc").html();
+
+		return { imageLink, title, genre, year, episodes, plot };
 	} catch (error) {
 		console.error("Error fetching the webpage:", error.message);
 		throw error;
@@ -173,8 +224,8 @@ function getVideoLink(videoID) {
  *
  * @example
  * // Play an anime video using the default media player
- * const videoLink = animeitaly.getVideoLink("example-id");
- * animeitaly.playVideo(videoLink);
+ * const videoLink = animeworld.getVideoLink("example-id");
+ * animeworld.playVideo(videoLink);
  */
 function playVideo(videoLink) {
 	const start =
@@ -192,6 +243,7 @@ function playVideo(videoLink) {
 
 module.exports = {
 	search,
+	getAnimeInfo,
 	getAnimeEpisodes,
 	getVideoLink,
 	playVideo,
