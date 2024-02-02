@@ -35,7 +35,7 @@
           <tr>
               <td>AnimeItaly</td>
               <td>~1097.9673 ms</td>
-              <td>~649.9082</td>
+              <td>~649.9082 ms</td>
               <td>~616.5255 ms</td>
               <td>~2394.8871 ms</td>
           </tr>
